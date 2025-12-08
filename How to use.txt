@@ -1,0 +1,15 @@
+How to start up backend?
+uvicorn app.main:app --reload
+
+web interface path?
+http://127.0.0.1:8000/docs
+
+root interface path?
+http://127.0.0.1:8000/
+
+激活python虚拟环境？
+venv\Scripts\activate.bat
+
+如何保存虚拟环境？
+pip freeze > requirements.txt
+

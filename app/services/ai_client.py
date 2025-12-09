@@ -1,13 +1,14 @@
-from typing import Optional
+from typing import Optional, List
 
 from app.services.llm_base import LlmBackend
 from app.services.llm_openai import LlmOpenaiBackend
 
 # 目前简单起见，就用一个全局的 backend 实例。
 # 将来根据配置或用户选择来决定用哪个 backend
-_llm_backend: Optional[LLMBackend] = None
+_llm_backend: Optional[LlmBackend] = None
 
-def get_llm_backend() -> LlmBackend:
+# 不希望backend暴露给外界，外界只通过chat/等函数实现功能
+def _get_llm_backend() -> LlmBackend:
     # 在这个局部使用全局的backend
     global _llm_backend
     if _llm_backend is None:
@@ -16,9 +17,15 @@ def get_llm_backend() -> LlmBackend:
     return _llm_backend
 
 def chat(message: List[dict]) -> str :
-    backend = get_llm_backend()
+    backend = _get_llm_backend()
 
     reply = backend.chat(message)
+    return reply
+
+def embed(texts: List[List[str]]) -> List[List[float]]:
+    backend = _get_llm_backend()
+
+    reply = backend.embed(texts)
     return reply
 
 
@@ -53,7 +60,7 @@ def chat_ai_test(user_message: str, conversation_id: str) -> str:
         }
     ]
 
-    backend = get_llm_backend()
+    backend = _get_llm_backend()
 
     response = backend.chat(message=messages)
 

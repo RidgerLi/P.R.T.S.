@@ -22,8 +22,8 @@ def chat_test(req: ChatRequest):
 
     return {"reply": response}
 
-@router.post("/chat_short_memory", response_model=ChatResponse)
-def chat_short_memory(req: ChatRequest, db: Session = Depends(get_db)):
+@router.post("/chat", response_model=ChatResponse)
+def chat(req: ChatRequest, db: Session = Depends(get_db)):
     normal_conversation = NomalConversationScene(db)
     reply, session_id = normal_conversation.chat(
         user_id=req.user_id or 1,

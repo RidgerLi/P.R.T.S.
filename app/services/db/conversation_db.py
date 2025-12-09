@@ -8,7 +8,7 @@ SESSION_TIMEOUT_MINUTES = 5
 RECENT_MESSAGE_COUNT = 10
 
 # 负责执行与近期对话有关db操作逻辑
-class ConversationRepository:
+class ConversationDB:
     # 需要一个db会话来执行存取逻辑
     def __init__(self, db: Session):
         self.db = db

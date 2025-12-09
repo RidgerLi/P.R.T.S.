@@ -4,6 +4,13 @@ from app.routers import chat
 from app.database import Base, engine
 import app.models
 
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] [%(levelname)s] %(message)s'
+)
+
 app = FastAPI()
 app.include_router(chat.router)
 

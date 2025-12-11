@@ -1,9 +1,14 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 
 from .session_manager import SessionManager
 from .memory_manager import MemoryManager
 from .promt_builder import build_conversation_prompt
 from .ai_client import chat
+from .audio_text_manager import run_stt, run_tts
+
+import logging
+logger = logging.getLogger(__name__)
 
 class NomalConversationScene:
     def __init__(self, db: Session):
@@ -37,4 +42,20 @@ class NomalConversationScene:
 
         return [reply, session_manager.session.id]
 
+    def audio_chat(self, user_id: int, audio_bytes: bytes) -> tuple[str, str, bytes, int]: # 返回user文字, reply文字、audio byts、session.i
+        try:
+            user_text = run_stt(audio_bytes)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"STT 失败: {e}")
+        
+        logger.info(f"完成stt：{user_text}")
+        ai_text, session_id = self.chat(user_id=user_id, user_input=user_text)
 
+        logger.info(f"完成chat：{ai_text}")
+        try:
+            ai_speech = run_tts(ai_text)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"TTS 失败: {e}")
+        
+        logger.info(f"完成tts")
+        return [user_text, ai_text, ai_speech, session_id]

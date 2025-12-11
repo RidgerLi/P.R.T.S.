@@ -1,6 +1,9 @@
 How to start up backend?
 uvicorn app.main:app --reload
 
+如何开启局域网监听接口：
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
 web interface path?
 http://127.0.0.1:8000/docs
 

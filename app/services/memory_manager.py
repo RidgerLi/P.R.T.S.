@@ -94,7 +94,7 @@ class MemoryManager:
         """
         query_emb = embed([user_input])[0] # 此处拿用户原文进行embedding，跟记忆summary的embedding进行匹配
         memory_db = MemoryDB(self.db)
-        candidates = memory_db.load_candidate_memories(user_id, scene)
+        candidates = memory_db.load_candidate_memories(user_id=user_id, scene=scene)
         if not candidates:
             return []
 

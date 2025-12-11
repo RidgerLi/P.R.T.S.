@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, BinaryIO
 
 from app.services.llm_base import LlmBackend
 from app.services.llm_openai import LlmOpenaiBackend
@@ -28,6 +28,21 @@ def embed(texts: List[List[str]]) -> List[List[float]]:
     reply = backend.embed(texts)
     return reply
 
+def stt(raw_bytes: bytes, language: str = "zh") -> str:
+    backend = _get_llm_backend()
+
+    reply = backend.stt(raw_bytes, language)
+    return reply
+
+def tts(
+    text: str,
+    voice: str = "alloy",
+    audio_format: str = "mp3",
+) -> bytes:
+    backend = _get_llm_backend()
+
+    reply = backend.tts(text, voice, audio_format)
+    return reply
 
 def echo_ai(message: str) -> str :
     return f"后端收到: {message}"

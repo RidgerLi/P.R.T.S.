@@ -1,5 +1,6 @@
 # app/services/audio_io.py
 from .ai_services.azure_tts_stt import stt_wav_to_text, tts_text_to_mp3
+from .utils.vosk import stt_wav_to_text_local
 import logging
 logger = logging.getLogger(__name__)
 
@@ -17,4 +18,12 @@ def run_stt(bytes: bytes) -> str:
     """
     logger.info(f"【stt running】")
     text = stt_wav_to_text(bytes)
+    return text
+
+def run_stt_local(bytes: bytes) -> str:
+    """
+    文本转语音 (Text-to-Speech).
+    """
+    logger.info(f"【stt running】")
+    text = stt_wav_to_text_local(bytes)
     return text

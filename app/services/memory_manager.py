@@ -9,6 +9,7 @@ from .ai_client import chat, embed
 from .utils.utils import cosine_similarity
 from ..models.memory_item import MemoryItem
 from app.schemas.chat import MemoryItemDTO
+from app.services.utils.embed_local import embed_text_local
 import logging 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +95,7 @@ class MemoryManager:
         """
         if not user_input or user_input.__len__ == 0:
             return []
-        query_emb = embed([user_input])[0] # 此处拿用户原文进行embedding，跟记忆summary的embedding进行匹配
+        query_emb = embed_text_local(user_input) # 此处拿用户原文进行embedding，跟记忆summary的embedding进行匹配
         memory_db = MemoryDB(self.db)
         candidates = memory_db.load_candidate_memories(user_id=user_id, scene=scene)
         if not candidates:

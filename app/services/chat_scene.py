@@ -5,7 +5,7 @@ from .session_manager import SessionManager
 from .memory_manager import MemoryManager
 from .promt_builder import build_conversation_prompt
 from .ai_client import chat
-from .audio_text_manager import run_stt, run_tts
+from .audio_text_manager import run_stt, run_tts, run_stt_local
 import time
 import logging
 logger = logging.getLogger(__name__)
@@ -53,7 +53,8 @@ class NomalConversationScene:
     def audio_chat(self, user_id: int, audio_bytes: bytes, background_tasks: BackgroundTasks) -> tuple[str, str, bytes, int]: # 返回user文字, reply文字、audio byts、session.i
         self.start = time.perf_counter()
         try:
-            user_text = run_stt(audio_bytes)
+            # user_text = run_stt(audio_bytes)
+            user_text = run_stt_local(audio_bytes)
             logger.info(f"【[TIMER] STT 完成，用时 {time.perf_counter() - self.start:.3f} 秒】")
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"STT 失败: {e}")

@@ -1,20 +1,20 @@
 # app/services/audio_io.py
-from typing import Any
-from io import BytesIO
-
-from .ai_client import tts, stt
-
-def run_stt(audio_bytes: bytes) -> str:
-    reply = stt(audio_bytes)
-
-    return reply
-
+from .ai_services.azure_tts_stt import stt_wav_to_text, tts_text_to_mp3
+import logging
+logger = logging.getLogger(__name__)
 
 def run_tts(text: str) -> bytes:
     """
     文本转语音 (Text-to-Speech).
     """
-    bytes = tts(text, "nova")
+    logger.info(f"【tts running】")
+    bytes = tts_text_to_mp3(text)
     return bytes
 
-
+def run_stt(bytes: bytes) -> str:
+    """
+    文本转语音 (Text-to-Speech).
+    """
+    logger.info(f"【stt running】")
+    text = stt_wav_to_text(bytes)
+    return text

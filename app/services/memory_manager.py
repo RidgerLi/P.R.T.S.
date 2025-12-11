@@ -92,6 +92,8 @@ class MemoryManager:
         - 用 embedding + cosine 从短期/长期记忆中取出若干相关条目
         - 并提升它们权重（被使用一次 = 记忆被“强化”一次）
         """
+        if not user_input or user_input.__len__ == 0:
+            return []
         query_emb = embed([user_input])[0] # 此处拿用户原文进行embedding，跟记忆summary的embedding进行匹配
         memory_db = MemoryDB(self.db)
         candidates = memory_db.load_candidate_memories(user_id=user_id, scene=scene)

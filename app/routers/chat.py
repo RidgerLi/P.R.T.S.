@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Form
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Form, BackgroundTasks
 from fastapi.responses import StreamingResponse, Response
 from sqlalchemy.orm import Session
 
@@ -6,7 +6,6 @@ from app.schemas.chat import EchoRequest, ChatRequest, ChatResponse
 from app.services.ai_client import echo_ai, chat_ai_test
 from app.services.chat_scene import NomalConversationScene
 from app.database import get_db
-import traceback
 
 import logging
 logger = logging.getLogger(__name__)
@@ -36,6 +35,7 @@ def chat(req: ChatRequest, db: Session = Depends(get_db)):
 
 @router.post("/audio_chat", response_class=StreamingResponse)
 async def audio_chat(
+    background_tasks: BackgroundTasks,
     audio: UploadFile = File(...),
     user_id: int = Form(1),
     conversation_id: int | None = Form(None),
@@ -48,7 +48,7 @@ async def audio_chat(
 
         audio_bytes = await audio.read()
         normal_conversation_scene = NomalConversationScene(db)
-        user_input, ai_text, ai_speech_bytes, session_id = normal_conversation_scene.audio_chat(user_id=user_id, audio_bytes=audio_bytes)
+        user_input, ai_text, ai_speech_bytes, session_id = normal_conversation_scene.audio_chat(user_id=user_id, audio_bytes=audio_bytes, background_tasks=background_tasks)
 
         if not ai_speech_bytes:
             raise HTTPException(status_code=500, detail="TTS returned empty audio")
@@ -77,6 +77,7 @@ async def audio_chat(
             # },
         )
     except HTTPException as e:
+        import traceback
         logger.error("**************")
         # 打印详细信息 + traceback
         logger.error("HTTPException in /ai/audio_chat: status=%s, detail=%s", e.status_code, e.detail)

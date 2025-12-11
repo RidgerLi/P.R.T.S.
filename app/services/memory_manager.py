@@ -66,7 +66,7 @@ class MemoryManager:
         # 只允许 short_term / long_term 两种类型
         mem_type = "long_term" if kind == "long_term" else "short_term"
 
-        embedding = embed([summary])[0]
+        embedding = embed_text_local(summary)
 
         memory_db = MemoryDB(self.db)
         memory_db.add_memory_item(

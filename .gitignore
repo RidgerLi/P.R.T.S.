@@ -43,3 +43,4 @@ thirdparty/vosk-model-cn-0.22/
 
 *.db
 app.db
+temp/

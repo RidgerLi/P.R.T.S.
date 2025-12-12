@@ -21,4 +21,58 @@ pip freeze > requirements.txt
 服务器python地址：
 /opt/python314/bin/python3.14 --version
 
+🔹 进程 / 端口相关
+ps -ef | grep mihomo
+ps -ef | grep uvicorn
+
+ss -lntp
+ss -lntp | grep 7890
+ss -lntp | grep 8000
+
+🔹 systemd / 服务管理
+systemctl status mihomo
+systemctl restart mihomo
+systemctl daemon-reload
+
+journalctl -u mihomo -n 50 --no-pager
+
+🔹 Mihomo / Clash 启动
+mihomo -d /etc/mihomo
+/usr/bin/mihomo -d /etc/mihomo
+
+🔹 网络 / 代理测试
+curl http://example.com
+curl -v http://example.com
+
+curl --proxy http://127.0.0.1:7890 http://example.com
+curl --proxy http://127.0.0.1:7890 https://ipinfo.io
+
+curl --noproxy '*' http://124.222.58.189:8000/docs
+
+🔹 Clash API / 节点切换
+curl http://127.0.0.1:9090/proxies
+curl http://127.0.0.1:9090/proxies | jq
+
+curl -X PUT http://127.0.0.1:9090/proxies/🔰选择节点 \
+  -H "Content-Type: application/json" \
+  -d '{"name":"🇭🇰 香港A01"}'
+
+🔹 环境变量 / 代理相关
+env | grep -i proxy
+
+export HTTP_PROXY=http://127.0.0.1:7890
+export HTTPS_PROXY=http://127.0.0.1:7890
+export ALL_PROXY=socks5://127.0.0.1:7891
+
+export no_proxy=localhost,127.0.0.1,::1
+
+🔹 Python / 服务启动
+source venv/bin/activate
+
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+🔹 SSH / 端口转发（本地电脑）
+ssh root@124.222.58.189
+ssh -L 8000:127.0.0.1:8000 root@124.222.58.189
+
 

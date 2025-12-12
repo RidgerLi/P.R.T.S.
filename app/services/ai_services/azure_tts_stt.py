@@ -21,6 +21,7 @@ def stt_wav_to_text(wav_bytes: bytes) -> str:
     )
     # 设置识别语言为中文（普通话）
     speech_config.speech_recognition_language = "zh-CN"
+    speech_config.set_proxy("127.0.0.1", 7890)
 
     # 2. 从 bytes 流创建音频输入
     # Azure SDK 需要一个 'PushStream' 来处理内存中的字节流
@@ -72,6 +73,7 @@ def tts_text_to_mp3(text: str) -> bytes:
 
     # 选择语音
     speech_config.speech_synthesis_voice_name = VOICE_NAME
+    # speech_config.set_proxy("127.0.0.1", 7890)
 
     # 2. 不指定 audio_config，表示输出到内存（result.audio_data）
     speech_synthesizer = speechsdk.SpeechSynthesizer(

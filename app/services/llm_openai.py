@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class LlmOpenaiBackend(LlmBackend):
     
-    def __init__(self, model_name:str = "gpt-5.1"):
+    def __init__(self, model_name:str = "gpt-5.2"):
     # def __init__(self, model_name:str = "gpt-5-mini"):
         if not OPEN_API_KEY:
             raise RuntimeError("OPENAI_API_KEY is not set. Check your .env file.")

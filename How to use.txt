@@ -12,7 +12,13 @@ http://127.0.0.1:8000/
 
 激活python虚拟环境？
 venv\Scripts\activate.bat
+服务器端：
+source venv/bin/activate
 
 如何保存虚拟环境？
 pip freeze > requirements.txt
+
+服务器python地址：
+/opt/python314/bin/python3.14 --version
+
 

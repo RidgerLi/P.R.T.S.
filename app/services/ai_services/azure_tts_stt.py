@@ -10,7 +10,7 @@ VOICE_NAME = "zh-CN-Xiaoxiao:DragonHDFlashLatestNeural"
 def stt_wav_to_text(wav_bytes: bytes) -> str:
     speech_config = speechsdk.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=SPEECH_REGION)
     speech_config.speech_recognition_language = "zh-CN"
-    # speech_config.set_proxy("127.0.0.1", 7890)  # ✅
+    speech_config.set_proxy("127.0.0.1", 18080)  # ✅
 
     # ✅ 从 wav 中解出 PCM
     with wave.open(io.BytesIO(wav_bytes), "rb") as wf:

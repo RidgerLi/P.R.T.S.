@@ -1,58 +1,53 @@
 import io
+import wave
 import azure.cognitiveservices.speech as speechsdk
-from app.config import AZURE_SPEECH_KEY, SPEECH_REGION
+from app.config import AZURE_SPEECH_KEY, SPEECH_REGION, PROJECT_ENDPOINT
 
 import logging
 logger = logging.getLogger(__name__)
 
 VOICE_NAME = "zh-CN-Xiaoxiao:DragonHDFlashLatestNeural"
-
 def stt_wav_to_text(wav_bytes: bytes) -> str:
-    """
-    将 WAV 格式的录音字节流 (bytes) 转化为文本 (str)。
-
-    :param wav_bytes: WAV 格式的字节流。
-    :return: 转化后的文本字符串，如果失败则返回空字符串。
-    """
-    # 1. 配置
-    speech_config = speechsdk.SpeechConfig(
-        subscription=AZURE_SPEECH_KEY,
-        region=SPEECH_REGION
-    )
-    # 设置识别语言为中文（普通话）
+    speech_config = speechsdk.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=SPEECH_REGION)
     speech_config.speech_recognition_language = "zh-CN"
-    speech_config.set_proxy("127.0.0.1", 18080)
+    # speech_config.set_proxy("127.0.0.1", 7890)  # ✅
 
-    # 2. 从 bytes 流创建音频输入
-    # Azure SDK 需要一个 'PushStream' 来处理内存中的字节流
-    push_stream = speechsdk.audio.PushAudioInputStream()
-    push_stream.write(wav_bytes)
-    push_stream.close() 
-    
-    # 3. 创建识别器
-    audio_config = speechsdk.audio.AudioConfig(stream=push_stream)
-    speech_recognizer = speechsdk.SpeechRecognizer(
-        speech_config=speech_config, 
-        audio_config=audio_config
+    # ✅ 从 wav 中解出 PCM
+    with wave.open(io.BytesIO(wav_bytes), "rb") as wf:
+        channels = wf.getnchannels()
+        sample_rate = wf.getframerate()
+        sampwidth = wf.getsampwidth()
+        pcm = wf.readframes(wf.getnframes())
+
+    if channels != 1 or sample_rate != 16000 or sampwidth != 2:
+        logger.warning(f"WAV format unexpected: ch={channels}, sr={sample_rate}, sw={sampwidth}")
+
+    stream_format = speechsdk.audio.AudioStreamFormat(
+        samples_per_second=sample_rate,
+        bits_per_sample=16,
+        channels=channels
     )
+    push_stream = speechsdk.audio.PushAudioInputStream(stream_format)
+    push_stream.write(pcm)
+    push_stream.close()
 
-    # 4. 执行识别
+    audio_config = speechsdk.audio.AudioConfig(stream=push_stream)
+    recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+
     logger.info("正在识别语音...")
-    result = speech_recognizer.recognize_once_async().get()
+    result = recognizer.recognize_once_async().get()
 
-    # 5. 处理结果
     if result.reason == speechsdk.ResultReason.RecognizedSpeech:
-        logger.info(f"识别成功: {result.text}")
         return result.text
-    elif result.reason == speechsdk.ResultReason.NoMatch:
-        logger.info("未识别到任何语音。")
+    if result.reason == speechsdk.ResultReason.NoMatch:
         return ""
-    elif result.reason == speechsdk.ResultReason.Canceled:
-        cancellation = speechsdk.CancellationDetails(result)
-        logger.info(f"识别被取消: Reason={cancellation.reason}")
-        logger.info(f"错误细节: {cancellation.error_details}")
+    if result.reason == speechsdk.ResultReason.Canceled:
+        try:
+            c = speechsdk.CancellationDetails(result)
+            logger.info(f"Canceled: {c.reason}, {c.error_details}")
+        except Exception as e:
+            logger.info(f"Canceled but read details failed: {e}")
         return ""
-    
     return ""
 
 def tts_text_to_mp3(text: str) -> bytes:
